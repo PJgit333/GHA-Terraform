@@ -5,3 +5,7 @@
 **/*.tfvars.json
 .terraform.lock.hcl
 crash.log
+
+**/.env
+**/variables.tf
+**/terraform.tfvars
