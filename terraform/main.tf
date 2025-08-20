@@ -1,5 +1,11 @@
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
+
+   default_tags {
+    tags = {
+      Environment = var.environment
+    }
+  }
 }
 
 resource "aws_vpc" "main" {
@@ -88,6 +94,9 @@ resource "aws_ecs_task_definition" "my_task" {
 }
 
 resource "aws_cloudfront_distribution" "s3_distribution" {
+
+  count = var.environment == "prod" ? 1 : 0
+
   origin {
     domain_name              = aws_s3_bucket.app_bucket.bucket_regional_domain_name
     origin_id                = "s3-app-bucket"
@@ -95,12 +104,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
 
   enabled             = true
   default_root_object = "index.html"
-  
-  logging_config {
-    include_cookies = false
-    bucket          = "mylogs.s3.amazonaws.com"
-    prefix          = "myprefix"
-  }
   
   default_cache_behavior {
     allowed_methods  = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
@@ -120,8 +123,6 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
     default_ttl            = 3600
     max_ttl                = 86400
   }
-	
-	price_class = "PriceClass_200"
 
   restrictions {
     geo_restriction {
@@ -131,7 +132,7 @@ resource "aws_cloudfront_distribution" "s3_distribution" {
   }
 
   tags = {
-    Environment = "production"
+    Environment = var.environment
   }
 
   viewer_certificate {
