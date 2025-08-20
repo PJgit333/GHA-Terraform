@@ -52,8 +52,8 @@ resource "aws_db_instance" "db" {
   engine            = "mysql"
   instance_class    = "db.t3.micro"
   allocated_storage = 20
-  username          = "admin"
-  password          = "password"
+  username          = var.username
+  password          = var.password
   publicly_accessible = true
 }
 
